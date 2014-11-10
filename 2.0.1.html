@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'>
+<title>Paper &bull; bin</title>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<link rel='stylesheet' href='../../../../../../../../1.2.0/use/http/code/normalize/3.0.0.css'>
+<link rel='stylesheet' href='../../../../../../../../1.2.0/use/href/style/1.2.0.css'>
+<style type='text/css'>
+
+	canvas{ border:1px solid #515045; float:left; margin:5px; height:200px; width:200px; }
+/*	.canvas{ z-index:5 }
+	#placeholder{ margin-left:-100; z-index:1 }*/
+	
+
+</style>
+</head>
+<body class=''>
+
+<div id="placeholder" class="pos.atc"></div>
+<div class="canvas">
+	<canvas id="cnvs-1"></canvas>
+</div>
+
+
+<script src="../../../../../../../../1.2.0/use/http/code/jquery/2.1.0.js"></script>
+<script src="../../../../../../../use/http/code/paper/0.9.20/full.js"></script>
+<script src="handlebars/2.0.0.js"></script>
+<script id="template" type="text/x-handlebars-template">
+
+<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="insert" height="500" width="500">
+	<defs id="reuseDef">
+		<clipPath id="CLIPDRAW" clipPathUnits="userSpaceOnUse">
+		  <rect id="clipper" y="0" x="0" height="200" width="200" style="display:inline;overflow:visible;visibility:visible;opacity:1;fill:#545045;fill-opacity:1;fill-rule:nonzero;stroke:none;enable-background:accumulate" />
+		</clipPath>
+		<pattern id="PATP1" patternUnits="userSpaceOnUse" width="200" height="200" patternTransform="matrix(0.25,0,0,0.25,0,0)">
+		  <use id="p1sym1" xlink:href="#DRAWREGULAR" x="0" y="0" width="100%" height="100%" />
+		</pattern>
+		<symbol id="DRAWREGULAR" clip-path="url(#CLIPDRAW)">{{{test}}}</symbol>
+	</defs>
+	<rect id="drawpreview" style="fill:url(#PATP1);stroke:none" x="0" y="0" height="500" width="500" />
+</svg>
+
+</script>
+<script type="text/javascript">
+
+function testers(){
+	var DATA = {test: localStorage.getItem('g5')}
+	var TEMPLATE = $("#template").html();
+	var COMPILE = Handlebars.compile(TEMPLATE);
+	$('#placeholder').append(COMPILE(DATA));
+};
+
+</script>
+<script type="text/paperscript" canvas="cnvs-1">
+
+	var exporter;
+	var path;
+	var settings = {
+		size: 10,
+		db:'g5'
+	};
+
+
+	tool.distanceThreshold = settings.size;
+	
+	function onMouseDown(event) {
+		path = new Path();
+		path.add(event.point);
+		path.strokeColor = 'black';
+		path.strokeWidth = settings.size;
+	}
+	
+	function onMouseDrag(event) {
+		path.add(event.point);
+		exporter = path.exportSVG({asString:true});
+				   localStorage.setItem(settings.db, exporter);
+		$('#insert').remove();
+		testers();
+	}
+	
+
+</script>
+</body>
+</html>
