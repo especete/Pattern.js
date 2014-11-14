@@ -6,9 +6,6 @@
 <style type='text/css'>
 
 	canvas{ border:1px solid #515045; float:left; margin:5px; height:200px; width:200px; }
-/*	.canvas{ z-index:5 }
-	#placeholder{ margin-left:-100; z-index:1 }*/
-	
 
 </style>
 </head>
@@ -42,7 +39,11 @@
 <script type="text/javascript">
 
 function testers(){
+	
+	// Make drawing available to be placed in template.
 	var DATA = {test: localStorage.getItem('g5')}
+	
+	// Render the template with the drawing inside the DOM element.
 	var TEMPLATE = $("#template").html();
 	var COMPILE = Handlebars.compile(TEMPLATE);
 	$('#placeholder').append(COMPILE(DATA));
@@ -53,30 +54,46 @@ function testers(){
 
 	var exporter;
 	var path;
+	var group = new Group();
 	var settings = {
 		size: 10,
-		db:'g5'
+		db:'g5',
+		color:'#515045'
 	};
-
-
+	
 	tool.distanceThreshold = settings.size;
 	
 	function onMouseDown(event) {
+		
+		// Create new stroke at touch origin, with some basic settings. ===== NOTE: Tool used solely to make events happening.
 		path = new Path();
 		path.add(event.point);
-		path.strokeColor = 'black';
+		path.strokeColor = settings.color;
 		path.strokeWidth = settings.size;
 	}
 	
 	function onMouseDrag(event) {
+		
+		// Continue setting stroke.
 		path.add(event.point);
-		exporter = path.exportSVG({asString:true});
+	}
+	function onMouseUp(event) {
+		
+		// Set end point to drawing.
+		path.add(event.point);
+		
+		// Move the finished stroke to group. ===== NOTE: This is a temporary solution. Needed is to export current layer, but id must be detailed first.
+		group.addChild(path);
+		
+		// Grap group, export as a stringed SVG and store in local.
+		exporter = group.exportSVG({asString:true});
 				   localStorage.setItem(settings.db, exporter);
+		
+		// Remove previously rendered DOM element and run template again. ===== NOTE: For proof of consept purpose, GID edition.
 		$('#insert').remove();
 		testers();
 	}
 	
-
 </script>
 </body>
 </html>
